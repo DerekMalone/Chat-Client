@@ -9,7 +9,7 @@ const data = {
     { role: "assistant", message: "Hello, how can I help you today?" },
     { role: "user", message: "I need a horoscope reading" },
   ],
-  isLoading: false
+  isLoading: false,
 };
 
 function App() {
@@ -19,26 +19,39 @@ function App() {
     if (!newMessage) {
       return;
     }
-setIsLoading(true) //we set loading to true here to display the balls in the assistant message bubble while we wait for the response from the server
-    setConversation([
-      ...conversation,
-      { role: "user", message: newMessage }
-        ]);
+    setIsLoading(true); //we set loading to true here to display the balls in the assistant message bubble while we wait for the response from the server
+    setConversation([...conversation, { role: "user", message: newMessage }]);
 
-    // send POST request to local server with the conversation payload for chat response 
+    // send POST request to local server with the conversation payload for chat response
     // "http://localhost:8088/chat", {//i will fill in this function later
-// it is necessary to temporarily use 'loading' as a message until we get a reponse from the server if we want to display the ellipses 
-  setConversation([
-    ...conversation, 
-    { role: "assistant", message: "Loading" }
-  ]);
+    // it is necessary to temporarily use 'loading' as a message until we get a response from the server if we want to display the ellipses
 
-  //then i will set the assistant message in this conversation with the actual response from the assistant  
+    // setConversation([
+    //   ...conversation,
+    //   { role: "assistant", message: "Loading" },
+    // ]);
 
+    // Perhaps we should look closely here?
+    fetch("http://localhost:8088/chat", {
+      method: "POST",
+      headers: {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(conversation),
+      },
+    })
+      .then((res) => res.json())
+      .then((dataRes) => {
+        setConversation([
+          ...conversation,
+          { role: "assistant", message: dataRes },
+        ]);
+      });
 
-
-
-  }; 
+    // We need to do is take the response from api and update the conversation with the response in the correct format.
+    //then i will set the assistant message in this conversation with the actual response from the assistant
+  };
 
   const showMessages = () => {
     return conversation.map((message, index) => (
@@ -69,15 +82,15 @@ setIsLoading(true) //we set loading to true here to display the balls in the ass
   };
 
   return (
-    <div className="app-container">
+    <div className='app-container'>
       <Header
         headerText={data.headerText}
         pText={data.pText}
         p2Text={data.p2Text}
       />
-      <div className="chat-container">
+      <div className='chat-container'>
         <ChatHeader />
-        <div className="msg-container">{showMessages()}</div>
+        <div className='msg-container'>{showMessages()}</div>
         <UserInput onInput={onInput} onClick={onClick} />
       </div>
     </div>
@@ -89,10 +102,12 @@ function MessageBubble(props) {
 
   return (
     <div className={`message-container ${messageClass}-message-container`}>
-      {props.role === "assistant" && props.isLoading && props.message === 'Loading' ? (
+      {props.role === "assistant" &&
+      props.isLoading &&
+      props.message === "Loading" ? (
         <div className={`chat-bubble ${messageClass}`}>
-          <div className="assistant-avatar">
-            <div className="balls">
+          <div className='assistant-avatar'>
+            <div className='balls'>
               <div></div>
               <div></div>
               <div></div>
@@ -100,19 +115,16 @@ function MessageBubble(props) {
           </div>
         </div>
       ) : (
-        <div className={`chat-bubble ${messageClass}`}>
-          {props.message}
-        </div>
+        <div className={`chat-bubble ${messageClass}`}>{props.message}</div>
       )}
     </div>
   );
 }
 
-
 function Header(props) {
   return (
-    <div className="header">
-      <div className="header-img" />
+    <div className='header'>
+      <div className='header-img' />
       <h1> {props.headerText} </h1>
       <h2> {props.pText} </h2>
       <p> {props.p2Text} </p>
@@ -122,24 +134,24 @@ function Header(props) {
 
 function ChatHeader() {
   return (
-    <div className="chat-header">
-      <div className="dot" />
-      <div className="dot" />
-      <div className="dot" />
+    <div className='chat-header'>
+      <div className='dot' />
+      <div className='dot' />
+      <div className='dot' />
     </div>
   );
 }
 
 function UserInput(props) {
   return (
-    <div className="input-container">
+    <div className='input-container'>
       <input
-        id="chat"
-        type="text"
+        id='chat'
+        type='text'
         onKeyPress={props.onInput}
-        placeholder="Type something..."
+        placeholder='Type something...'
       />
-      <button className="input-submit" onClick={props.onClick} />
+      <button className='input-submit' onClick={props.onClick} />
     </div>
   );
 }
