@@ -23,7 +23,11 @@ function App() {
       return;
     }
     setIsLoading(true); //we set loading to true here to display the balls in the assistant message bubble while we wait for the response from the server
-    setConversation([...conversation, { role: "user", content: newMessage }]);
+    const userMessage = [
+      ...conversation,
+      { role: "user", content: newMessage },
+    ];
+    setConversation(userMessage);
 
     // send POST request to local server with the conversation payload for chat response
     // "http://localhost:8088/chat", {//i will fill in this function later
@@ -39,13 +43,13 @@ function App() {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(conversation),
+      body: JSON.stringify(userMessage),
     })
       .then((res) => res.json())
       .then((dataRes) => {
         setIsLoading(false);
         setConversation([
-          ...conversation,
+          ...userMessage,
           { role: "assistant", content: dataRes },
         ]);
       });
